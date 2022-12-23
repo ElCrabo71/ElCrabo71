@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>NFT Ticket Minting</title>
+  </head>
+  <body>
+    <h1>NFT Ticket Minting</h1>
+    <form id="mint-form">
+      <label for="event-id">Event ID:</label><br>
+      <input type="text" id="event-id" name="event-id"><br>
+      <label for="ticket-id">Ticket ID:</label><br>
+      <input type="text" id="ticket-id" name="ticket-id"><br>
+      <label for="metadata">Metadata:</label><br>
+      <input type="text" id="metadata" name="metadata"><br><br>
+      <input type="submit" value="Mint Ticket">
+    </form>
+    <div id="result"></div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="./mint.js"></script>
+    <script>
+      const form = document.getElementById('mint-form');
+      const result = document.getElementById('result');
+
+      form.onsubmit = async (event) => {
+        event.preventDefault();
+        result.innerHTML = '';
+        const eventId = form.event-id.value;
+        const ticketId = form.ticket-id.value;
+        const metadata = form.metadata.value;
+        try {
+          await mintTicket(eventId, ticketId, metadata);
+          result.innerHTML = 'Ticket minted successfully';
+        } catch (error) {
+          result.innerHTML = `Error: ${error}`;
+        }
+      };
+    </script>
+  </body>
+</html>
