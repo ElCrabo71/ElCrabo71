@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>NFT Ticket Management</title>
+  </head>
+  <body>
+    <h1>NFT Ticket Management</h1>
+    <h2>Mint Ticket</h2>
+    <form id="mint-form">
+      <label for="event-id">Event ID:</label><br>
+      <input type="text" id="event-id" name="event-id"><br>
+      <label for="ticket-id">Ticket ID:</label><br>
+      <input type="text" id="ticket-id" name="ticket-id"><br>
+      <label for="metadata">Metadata:</label><br>
+      <input type="text" id="metadata" name="metadata"><br><br>
+      <input type="submit" value="Mint Ticket">
+    </form>
+    <div id="mint-result"></div>
+    <h2>Transfer Ticket</h2>
+    <form id="transfer-form">
+      <label for="ticket-id">Ticket ID:</label><br>
+      <input type="text" id="ticket-id" name="ticket-id"><br>
+      <label for="to">To:</label><br>
+      <input type="text" id="to" name="to"><br><br>
+      <input type="submit" value="Transfer Ticket">
+    </form>
+    <div id="transfer-result"></div>
+    <h2>Check Ownership</h2>
+    <form id="ownership-form">
+      <label for="ticket-id">Ticket ID:</label><br>
+      <input type="text" id="ticket-id" name="ticket-id"><br><br>
+      <input type="submit" value="Check Ownership">
+    </form>
+    <div id="ownership-result"></div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="./management.js"></script>
+    <script>
+      const mintForm = document.getElementById('mint-form');
+      const mintResult = document.getElementById('mint-result');
+      const transferForm = document.getElementById('transfer-form');
+      const transferResult = document.getElementById('transfer-result');
+      const ownershipForm = document.getElementById('ownership-form');
+      const ownershipResult = document.getElementById('ownership-result');
+
+      mintForm.onsubmit = async (event) => {
+        event.preventDefault();
+        mintResult.innerHTML = '';
+        const eventId = mintForm.event-id.value;
+        const ticketId = mintForm.ticket-id.value;
+        const metadata = mintForm.metadata.value;
+        try {
+          await mintTicket(eventId, ticketId, metadata);
+          mintResult.innerHTML = 'Ticket minted successfully';
+        } catch (error) {
+          mintResult.innerHTML = `Error: ${error}`;
+        }
+      };
+
+      transferForm
