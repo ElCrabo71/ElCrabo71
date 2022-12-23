@@ -1,0 +1,113 @@
+const Web3 = require('web3');
+const IPFS = require('ipfs-api');
+const ERC20 = require('./erc20.json');
+const NFT = require('./nft.json');
+
+// Connect to the Quadrans Blockchain and IPFS network.
+const web3 = new Web3('https://rpc.quadrans.io');
+const ipfs = new IPFS({ host: 'ipfs.quadrans.io', port: '5001', protocol: 'https' });
+
+// Set the wallet address and private key.
+const walletAddress = '0x1234567890';
+const privateKey = '0x1234567890';
+
+// Set the contract addresses for the QDC coin and NFT assets.
+const qdcAddress = '0x1234567890';
+const nftAddress = '0x1234567890';
+
+// Set the contract instances for the QDC coin and NFT assets.
+const qdc = new web3.eth.Contract(ERC20, qdcAddress);
+const nft = new web3.eth.Contract(NFT, nftAddress);
+
+// Check the balance of the wallet.
+async function checkBalance() {
+  const qdcBalance = await qdc.methods.balanceOf(walletAddress).call();
+  const nftBalance = await nft.methods.balanceOf(walletAddress).call();
+  console.log(`QDC balance: ${qdcBalance}`);
+  console.log(`NFT balance: ${nftBalance}`);
+}
+
+// Transfer QDC or NFT assets to another address.
+async function transfer(to, value, asset) {
+  // Set the transaction data and options.
+  let data, options;
+  if (asset === 'QDC') {
+    data = qdc.methods.transfer(to, value).encodeABI();
+    options = { from: walletAddress, to: qdcAddress, value: 0, data };
+  } else if (asset === 'NFT') {
+    data = nft.methods.transfer(to, value).encodeABI();
+    options = { from: walletAddress, to: nftAddress, value: 0, data };
+  } else {
+    console.log('Invalid asset');
+    return;
+  }
+  // Sign and send the transaction.
+  const signedTx = await web3.eth.accounts.signTransaction(options, privateKey);
+  const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  console.log(`Transaction hash: ${receipt.transactionHash}`);
+}
+
+// Store a file on IPFS and get its hash.
+async function storeOnIPFS(file) {
+  const fileBuffer = Buffer.from(file);
+  const ipfsHash = await ipfs.files.add(fileBuffer);
+  return ipfsHash[0].hash;
+}
+
+
+  //
+// Set the metadata of an NFT asset.
+
+async function setMetadata(tokenId, metadata) {
+  // Store the metadata on IPFS and get its hash.
+  const ipfsHash = await storeOnIPFS(metadata);
+  // Set the transaction data and options.
+  const data = nft.methods.setMetadata(tokenId, ipfsHash).encodeABI();
+  const options = { from: walletAddress, to: nftAddress, value: 0, data };
+  // Sign and send the transaction.
+  const signedTx = await web3.eth.accounts.signTransaction(options, privateKey);
+  const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  console.log(`Transaction hash: ${receipt.transactionHash}`);
+}
+
+// Get the metadata of an NFT asset.
+async function getMetadata(tokenId) {
+  // Get the IPFS hash of the metadata.
+  const ipfsHash = await nft.methods.getMetadata(tokenId).call();
+  // Retrieve the metadata from IPFS.
+  const file = await ipfs.files.cat(ipfsHash);
+  return file.toString();
+}
+
+// Approve the transfer of an NFT asset.
+async function approve(spender, tokenId) {
+  // Set the transaction data and options.
+  const data = nft.methods.approve(spender, tokenId).encodeABI();
+  const options = { from: walletAddress, to: nftAddress, value: 0, data };
+  // Sign and send the transaction.
+  const signedTx = await web3.eth.accounts.signTransaction(options, privateKey);
+  const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  console.log(`Transaction hash: ${receipt.transactionHash}`);
+}
+
+// Transfer an NFT asset from another address.
+async function transferFrom(from, to, tokenId) {
+  // Set the transaction data and options.
+  const data = nft.methods.transferFrom(from, to, tokenId).encodeABI();
+  const options = { from: walletAddress, to: nftAddress, value: 0, data };
+  // Sign and send the transaction.
+  const signedTx = await web3.eth.accounts.signTransaction(options, privateKey);
+  const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  console.log(`Transaction hash: ${receipt.transactionHash}`);
+}
+
+// Get the owner of an NFT asset.
+async function ownerOf(tokenId) {
+  return await nft.methods.ownerOf(tokenId).call();
+}
+
+// Get the approval status of an NFT asset.
+async function getApproval(tokenId) {
+  return await nft.methods.getApproval(tokenId).call();
+}
+
