@@ -1,0 +1,30 @@
+const Web3 = require('web3');
+const ERC721 = require('./erc721.json');
+const ERC1155 = require('./erc1155.json');
+
+// Connect to the Ethereum network.
+const web3 = new Web3('https://rpc.ethereum.org');
+
+// Set the wallet address and private key.
+const walletAddress = '0x1234567890';
+const privateKey = '0x1234567890';
+
+// Set the contract address for the NFT tickets.
+const nftAddress = '0x1234567890';
+
+// Set the contract instance for the NFT tickets.
+const nft = new web3.eth.Contract(ERC721, nftAddress);
+
+// Set the contract instance for the NFT tickets using the ERC1155 standard.
+//const nft = new web3.eth.Contract(ERC1155, nftAddress);
+
+// Mint a new NFT ticket for an event.
+async function mintTicket(eventId, ticketId, metadata) {
+  // Set the transaction data and options.
+  const data = nft.methods.mint(eventId, ticketId, metadata).encodeABI();
+  const options = { from: walletAddress, to: nftAddress, value: 0, data };
+  // Sign and send the transaction.
+  const signedTx = await web3.eth.accounts.signTransaction(options, privateKey);
+  const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  console.log(`Transaction hash: ${receipt.transactionHash}`);
+}
